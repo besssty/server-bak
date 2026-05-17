@@ -1,0 +1,5 @@
+day;reviewCount;correctCount;calculation;expectedRetention
+1;10;7;7 з 10;
+2;4;4;4 з 4;
+3;2;1;1 з 2;
+Усього;16;12;R = round((12/16)×100%) = 75%;75

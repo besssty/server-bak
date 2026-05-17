@@ -1,0 +1,8 @@
+node_modules/
+dist/
+tmp/
+src/generated/
+.env
+.env.*
+!.env.example
+*.log

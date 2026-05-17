@@ -1,0 +1,139 @@
+// server/prisma/schema.prisma
+// ─────────────────────────────────────────────────────────────
+// Схема бази даних PostgreSQL для FlashLearn.
+//
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MaterialGenerationStatus {
+  idle
+  queued
+  failed
+  completed
+}
+
+// ── User ──────────────────────────────────────────────────────
+// Застосунок використовує виключно Google OAuth (googleId).
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  googleId  String?  @unique                // sub з Google id_token
+  sessionVersion Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userCards  UserCard[]
+  reviews    Review[]
+  dailyStats DailyStat[]
+  packs      Pack[]
+  materials  Material[]
+}
+
+// ── Pack ──────────────────────────────────────────────────────
+// Кожен пак належить користувачу; публічні паки не підтримуються.
+model Pack {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int      @default(0)
+
+  createdById String
+
+  createdBy User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  cards     Card[]
+  generatedMaterial Material? @relation("MaterialGeneratedPack")
+
+  @@index([createdById])
+}
+
+// ── Card ──────────────────────────────────────────────────────
+model Card {
+  id       String @id @default(cuid())
+  question String
+  answer   String
+  order    Int    @default(0)
+  packId   String
+
+  pack      Pack       @relation(fields: [packId], references: [id], onDelete: Cascade)
+  userCards UserCard[]
+  reviews   Review[]
+
+  @@index([packId])
+}
+
+// ── UserCard ──────────────────────────────────────────────────
+model UserCard {
+  id     String @id @default(cuid())
+  userId String
+  cardId String
+
+  repetition     Int      @default(0)
+  interval       Int      @default(0)
+  easeFactor     Float    @default(2.5)
+  nextReviewDate DateTime @default(now())
+  isLearned      Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId])
+  @@index([userId, nextReviewDate])
+}
+
+// ── Review ────────────────────────────────────────────────────
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  cardId     String
+  quality    Int
+  reviewedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([userId, reviewedAt])
+}
+
+// ── Material ──────────────────────────────────────────────────
+// Особистий навчальний матеріал/конспект юзера.
+// Завжди приватний — видимий лише власнику.
+// cardsGenerated = true якщо вже було виконано генерацію карток (можна тільки один раз).
+model Material {
+  id             String   @id @default(cuid())
+  title          String
+  description    String?
+  content        String   @default("")   // Текст конспекту (редактор)
+  cardsGenerated Boolean  @default(false) // Блокує повторну генерацію
+  generationStatus MaterialGenerationStatus @default(idle)
+  generationError String?
+  generatedPackId String? @unique // ID створеного паку після генерації
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  generatedPack Pack? @relation("MaterialGeneratedPack", fields: [generatedPackId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId, updatedAt])
+}
+
+// ── DailyStat ─────────────────────────────────────────────────
+model DailyStat {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime
+  reviewCount  Int      @default(0)
+  correctCount Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}

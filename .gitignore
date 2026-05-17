@@ -1,0 +1,25 @@
+# dependencies 
+
+node_modules/
+
+# environment variables 
+
+.env
+.env.*
+!.env.example
+
+# logs
+
+*.log
+
+# build / cache
+
+dist/
+build/
+.next/
+.cache/
+
+# misc
+
+.DS_Store
+Thumbs.db

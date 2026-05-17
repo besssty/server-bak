@@ -1,0 +1,12 @@
+# Файли, які не мають потрапляти в Docker build context backend.
+# Це пришвидшує build і не копіює секрети/тимчасові артефакти в образ.
+node_modules
+dist
+tmp
+src/generated
+.env
+.env.*
+*.log
+npm-debug.log*
+.DS_Store
+coverage
