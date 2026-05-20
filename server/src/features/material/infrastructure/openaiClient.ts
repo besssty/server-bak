@@ -162,7 +162,12 @@ function logResponse(
 	if (status === 'ok') {
 		console.log(`\n[GPT #${requestNum} RESPONSE] ${ts} `)
 		console.log(
-			`Status  : OK, Model   : ${MODEL}, Prompt  : ${requestDetails.promptLength} chars, Cards   : ${cardsCount ?? 'n/a'}, Input   : ${tokenUsage?.inputTokens ?? 'n/a'} tokens, Output  : ${tokenUsage?.outputTokens ?? 'n/a'} tokens, Total   : ${tokenUsage?.totalTokens ?? 'n/a'} tokens`,
+			`Status  : OK, Model   : ${MODEL}, 
+			Prompt  : ${requestDetails.promptLength} chars, 
+			Cards   : ${cardsCount ?? 'n/a'}, 
+			Input   : ${tokenUsage?.inputTokens ?? 'n/a'} tokens, 
+			Output  : ${tokenUsage?.outputTokens ?? 'n/a'} tokens, 
+			Total   : ${tokenUsage?.totalTokens ?? 'n/a'} tokens`,
 		)
 		return
 	}

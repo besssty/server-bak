@@ -12,7 +12,7 @@ export async function startServer(app: Express, port: number): Promise<void> {
     startCardGenerationWorker((data) => processQueuedCardsGeneration(data));
   }
 
-  app.listen(port, '0.0.0.0', () => {
-    console.log(`Server running on port ${port}`);
+  app.listen(port || 8081, '0.0.0.0', () => {
+    console.log(`Server running on port ${port || 8081}`);
   });
 }
