@@ -41,6 +41,6 @@ jobs:
       - name: Restart ECS service
         run: |
           aws ecs update-service \
-            --cluster ${{ secrets.ECS_CLUSTER }} \
-            --service ${{ secrets.ECS_SERVICE }} \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --service "${{ secrets.ECS_SERVICE }}" \
             --force-new-deployment
