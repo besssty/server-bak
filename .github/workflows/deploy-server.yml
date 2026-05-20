@@ -38,7 +38,7 @@ jobs:
           docker build -t $IMAGE_URI ./server
           docker push $IMAGE_URI
 
-		- name: Restart ECS service
+      - name: Restart ECS service
         run: |
           aws ecs update-service \
             --cluster ${{ secrets.ECS_CLUSTER }} \
